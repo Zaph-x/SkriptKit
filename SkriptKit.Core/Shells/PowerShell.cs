@@ -12,9 +12,7 @@ namespace SkriptKit.Core.Shells
         private PSVersion _version { get; set; }
         private string _interpreter { get; set; }
         private string _exitCodeVariable { get; set; }
-
         public string STDOut {get;private set;}
-
         public string STDErr {get;private set;}
 
         public PowerShell(int version)
@@ -45,7 +43,7 @@ namespace SkriptKit.Core.Shells
                     }
                     else
                     {
-                        throw new InvalidOSException("PowerShell V3 scripts must be executed on a Windows machine.");
+                        throw new InvalidOSException("PowerShell V3.x scripts must be executed on a Windows machine.");
                     }
                     break;
                 case PSVersion.V6:
