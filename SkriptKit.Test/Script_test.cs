@@ -8,6 +8,8 @@ using SkriptKit.Core.Shells;
 
 namespace SkriptKit.Test
 {
+    [TestFixture]
+    [Platform(Exclude="Linux,Unix,MacOsX")]
     public class Tests
     {
         Script script;
@@ -20,7 +22,7 @@ namespace SkriptKit.Test
         [Test]
         public void Test_Run_CanRunPowerShellScript()
         {
-            script.Shell = new PowerShell(7);
+            script.Shell = new PowerShell(3);
             script.ScriptBlock = "ping google.com";
             Console.WriteLine($"stdout:\n{script.Shell.STDOut}");
             Console.WriteLine($"stderr:\n{script.Shell.STDErr}");
@@ -31,7 +33,7 @@ namespace SkriptKit.Test
         [Test]
         public void Test_Run_FailingScriptShouldNotReturnZero()
         {
-            script.Shell = new PowerShell(7);
+            script.Shell = new PowerShell(3);
             script.ScriptBlock = "png google.com";
             Assert.AreNotEqual(0, script.Run(), "Script did not exit with a non-zero exit code");
             Console.WriteLine($"stdout:\n{script.Shell.STDOut}");
@@ -41,7 +43,7 @@ namespace SkriptKit.Test
         [Test]
         public void Test_Run_RequiresAdminShouldFailIfNotAdmin()
         {
-            var mock = new Mock<PowerShell>(7);
+            var mock = new Mock<PowerShell>(3);
             mock.SetupGet(shell => shell.IsElevated).Returns(false);
             script.Shell = mock.Object;
             script.ScriptBlock = @"echo ""test""";
@@ -54,7 +56,7 @@ namespace SkriptKit.Test
         [Test]
         public void Test_Run_RequiresAdminShouldNotFailIfAdmin()
         {
-            var mock = new Mock<PowerShell>(7);
+            var mock = new Mock<PowerShell>(3);
             mock.SetupGet(shell => shell.IsElevated).Returns(true);
             script.Shell = mock.Object;
             script.ScriptBlock = @"echo ""test""";
