@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using SkriptKit.Core.Exceptions;
 using SkriptKit.Core.Interfaces;
 using System.IO;
+using SkriptKit.Core.Objects.Helpers;
 
 namespace SkriptKit.Core.Shells
 {
@@ -14,9 +15,11 @@ namespace SkriptKit.Core.Shells
         private string _exitCodeVariable { get; set; }
         public string STDOut {get;private set;}
         public string STDErr {get;private set;}
+        public virtual bool IsElevated {get;private set;}
 
         public PowerShell(int version)
         {
+            IsElevated = RootHelper.IsAdministrator;
             switch (version)
             {
                 case 3:
@@ -69,6 +72,7 @@ namespace SkriptKit.Core.Shells
             proc.WaitForExit();
             STDOut = proc.StandardOutput.ReadToEnd();
             STDErr = proc.StandardError.ReadToEnd();
+            proc.WaitForExit();
             return proc.ExitCode;
         }
     }

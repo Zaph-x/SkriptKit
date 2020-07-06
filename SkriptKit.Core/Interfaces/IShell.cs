@@ -4,6 +4,7 @@ namespace SkriptKit.Core.Interfaces
     {
         string STDOut { get; }
         string STDErr { get; }
+        bool IsElevated {get;}
         int RunScript(string script);
     }
 }
