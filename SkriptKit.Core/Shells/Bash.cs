@@ -12,13 +12,15 @@ namespace SkriptKit.Core.Shells
     {
         private string _interpreter { get; set; }
         private string _exitCodeVariable { get; set; }
-        public string STDOut {get;private set;}
-        public string STDErr {get;private set;}
-        public virtual bool IsElevated {get;private set;}
+        public string STDOut { get; private set; }
+        public string STDErr { get; private set; }
+        public virtual bool IsElevated { get; private set; }
+        public bool WSL { get; set; }
 
-        public Bash()
+        public Bash(bool wsl)
         {
-            _interpreter = "/bin/bash";
+            WSL = wsl;
+            _interpreter = wsl ? "wsl" : "/bin/bash";
         }
         public int RunScript(string script)
         {
