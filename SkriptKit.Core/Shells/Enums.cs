@@ -6,4 +6,12 @@ namespace SkriptKit.Core.Shells
         V6,
         V7
     }
+
+    public enum ShellType
+    {
+        Bash,
+        PowerShell,
+        CMD,
+        Custom
+    }
 }
