@@ -13,8 +13,8 @@ namespace SkriptKit.Core.Shells
         private PSVersion _version { get; set; }
         private string _interpreter { get; set; }
         private string _exitCodeVariable { get; set; }
-        public string STDOut {get;private set;}
-        public string STDErr {get;private set;}
+        public string StandardOutput {get;private set;}
+        public string StandardError {get;private set;}
         public virtual bool IsElevated {get;private set;}
 
         public PowerShell(int version)
@@ -66,13 +66,12 @@ namespace SkriptKit.Core.Shells
                     RedirectStandardInput = true,
                 }
             };
+            proc.StartInfo.ArgumentList.Add("-c");
+            proc.StartInfo.ArgumentList.Add(script);
             proc.Start();
-            using (StreamWriter sw = proc.StandardInput)
-                sw.WriteLine(script);
             proc.WaitForExit();
-            STDOut = proc.StandardOutput.ReadToEnd();
-            STDErr = proc.StandardError.ReadToEnd();
-            proc.WaitForExit();
+            StandardOutput = proc.StandardOutput.ReadToEnd();
+            StandardError = proc.StandardError.ReadToEnd();
             return proc.ExitCode;
         }
     }

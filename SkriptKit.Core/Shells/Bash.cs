@@ -12,8 +12,8 @@ namespace SkriptKit.Core.Shells
     {
         private string _interpreter { get; set; }
         private string _exitCodeVariable { get; set; }
-        public string STDOut { get; private set; }
-        public string STDErr { get; private set; }
+        public string StandardOutput { get; private set; }
+        public string StandardError { get; private set; }
         public virtual bool IsElevated { get; private set; }
         public bool WSL { get; set; }
 
@@ -36,12 +36,13 @@ namespace SkriptKit.Core.Shells
                     RedirectStandardInput = true,
                 }
             };
+            proc.StartInfo.ArgumentList.Add("-c");
             proc.Start();
             using (StreamWriter sw = proc.StandardInput)
                 sw.WriteLine(script);
             proc.WaitForExit();
-            STDOut = proc.StandardOutput.ReadToEnd();
-            STDErr = proc.StandardError.ReadToEnd();
+            StandardOutput = proc.StandardOutput.ReadToEnd();
+            StandardError = proc.StandardError.ReadToEnd();
             proc.WaitForExit();
             return proc.ExitCode;
         }
