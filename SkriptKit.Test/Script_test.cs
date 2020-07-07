@@ -9,8 +9,7 @@ using SkriptKit.Core.Shells;
 namespace SkriptKit.Test
 {
     [TestFixture]
-    [Platform(Exclude="Linux,Unix,MacOsX")]
-    public class Tests
+    public class Script_Tests
     {
         Script script;
         [SetUp]
@@ -20,27 +19,28 @@ namespace SkriptKit.Test
         }
 
         [Test]
+        [Platform(Exclude = "Linux,Unix,MacOsX")]
         public void Test_Run_CanRunPowerShellScript()
         {
             script.Shell = new PowerShell(3);
             script.ScriptBlock = "ping google.com";
-            Console.WriteLine($"stdout:\n{script.Shell.STDOut}");
-            Console.WriteLine($"stderr:\n{script.Shell.STDErr}");
             Assert.AreEqual(0, script.Run(), "Script did not exit with an exitcode of 0");
+            TestHelper.WriteOutput(script.Shell, TestContext.CurrentContext);
         }
 
 
         [Test]
+        [Platform(Exclude = "Linux,Unix,MacOsX")]
         public void Test_Run_FailingScriptShouldNotReturnZero()
         {
             script.Shell = new PowerShell(3);
             script.ScriptBlock = "png google.com";
             Assert.AreNotEqual(0, script.Run(), "Script did not exit with a non-zero exit code");
-            Console.WriteLine($"stdout:\n{script.Shell.STDOut}");
-            Console.WriteLine($"stderr:\n{script.Shell.STDErr}");
+            TestHelper.WriteOutput(script.Shell, TestContext.CurrentContext);
         }
 
         [Test]
+        [Platform(Exclude = "Linux,Unix,MacOsX")]
         public void Test_Run_RequiresAdminShouldFailIfNotAdmin()
         {
             var mock = new Mock<PowerShell>(3);
@@ -49,11 +49,11 @@ namespace SkriptKit.Test
             script.ScriptBlock = @"echo ""test""";
             script.RequireAdministrator = true;
             Assert.Throws<InsufficientPermissionsException>(() => script.Run(), "Script did not throw an exception");
-            Console.WriteLine($"stdout:\n{script.Shell.STDOut}");
-            Console.WriteLine($"stderr:\n{script.Shell.STDErr}");
+            TestHelper.WriteOutput(script.Shell, TestContext.CurrentContext);
         }
 
         [Test]
+        [Platform(Exclude = "Linux,Unix,MacOsX")]
         public void Test_Run_RequiresAdminShouldNotFailIfAdmin()
         {
             var mock = new Mock<PowerShell>(3);
@@ -62,8 +62,31 @@ namespace SkriptKit.Test
             script.ScriptBlock = @"echo ""test""";
             script.RequireAdministrator = true;
             Assert.AreEqual(0, script.Run(), "User was not considered admin");
-            Console.WriteLine($"stdout:\n{script.Shell.STDOut}");
-            Console.WriteLine($"stderr:\n{script.Shell.STDErr}");
+            TestHelper.WriteOutput(script.Shell, TestContext.CurrentContext);
+        }
+
+        [Test]
+        [Platform(Exclude = "Linux,Unix,MacOsX")]
+        public void Test_Run_ShouldHaveIOAccess()
+        {
+            var mock = new Mock<PowerShell>(3);
+            mock.SetupGet(shell => shell.IsElevated).Returns(true);
+            script.Shell = mock.Object;
+            script.ScriptBlock = @"echo ""test"" > .\test.txt";
+            script.RequireAdministrator = true;
+            Assert.AreEqual(0, script.Run(), "User was not considered admin");
+            TestHelper.WriteOutput(script.Shell, TestContext.CurrentContext);
+        }
+
+        [Test]
+        [Platform(Exclude = "Linux,MacOsX,Unix")]
+        public void Test_Script_ShouldChooseDefaultInterpreterWhenNull()
+        {
+            script.ScriptBlock = @"echo ""Hello""";
+            script.Shell = null;
+            script.Run();
+            Assert.IsInstanceOf(typeof(PowerShell), script.Shell, "Correct interpreter was not chosen");
+            TestHelper.WriteOutput(script.Shell, TestContext.CurrentContext);
         }
     }
 }
