@@ -5,6 +5,7 @@ using SkriptKit.Core.Exceptions;
 using SkriptKit.Core.Interfaces;
 using System.IO;
 using SkriptKit.Core.Objects.Helpers;
+using SkriptKit.Core.Objects;
 
 namespace SkriptKit.Core.Shells
 {
@@ -13,9 +14,9 @@ namespace SkriptKit.Core.Shells
         private PSVersion _version { get; set; }
         private string _interpreter { get; set; }
         private string _exitCodeVariable { get; set; }
-        public string StandardOutput {get;private set;}
-        public string StandardError {get;private set;}
-        public virtual bool IsElevated {get;private set;}
+        public string StandardOutput { get; private set; }
+        public string StandardError { get; private set; }
+        public virtual bool IsElevated { get; private set; }
 
         public PowerShell(int version)
         {
@@ -33,6 +34,27 @@ namespace SkriptKit.Core.Shells
                     break;
 
             }
+        }
+
+        public PowerShell(int version, bool requiresAdmin, string arguments, string scriptBlock, bool runNow)
+        {
+            IsElevated = RootHelper.IsAdministrator;
+            switch (version)
+            {
+                case 3:
+                    _version = PSVersion.V3;
+                    break;
+                case 6:
+                    _version = PSVersion.V6;
+                    break;
+                case 7:
+                    _version = PSVersion.V7;
+                    break;
+
+            }
+            Script script = new Script() { RequireAdministrator = requiresAdmin, ScriptBlock = scriptBlock, Shell = this };
+            if (runNow)
+                script.Run();
         }
 
         public int RunScript(string script)

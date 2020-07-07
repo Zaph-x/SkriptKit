@@ -6,6 +6,7 @@ using SkriptKit.Core.Exceptions;
 using SkriptKit.Core.Interfaces;
 using System.IO;
 using SkriptKit.Core.Objects.Helpers;
+using SkriptKit.Core.Objects;
 
 namespace SkriptKit.Core.Shells
 {
@@ -23,6 +24,15 @@ namespace SkriptKit.Core.Shells
             _interpreter = interpreter;
             Arguments = arguments;
         }
+
+        public CustomShell(int version, bool requiresAdmin, string arguments, string scriptBlock, bool runNow)
+        {
+            IsElevated = RootHelper.IsAdministrator;
+            Script script = new Script() { RequireAdministrator = requiresAdmin, ScriptBlock = scriptBlock, Shell = this };
+            if (runNow)
+                script.Run();
+        }
+
         public int RunScript(string script)
         {
             Process proc = new Process()
@@ -37,14 +47,12 @@ namespace SkriptKit.Core.Shells
                     RedirectStandardInput = true,
                 }
             };
-            // foreach (string arg in Arguments) { proc.StartInfo.ArgumentList.Add(arg); }
+            foreach (string arg in Arguments) { proc.StartInfo.ArgumentList.Add(arg); }
+            proc.StartInfo.ArgumentList.Add(script);
             proc.Start();
-            using (StreamWriter sw = proc.StandardInput)
-                sw.WriteLine(script);
             proc.WaitForExit();
             StandardOutput = proc.StandardOutput.ReadToEnd();
             StandardError = proc.StandardError.ReadToEnd();
-            proc.WaitForExit();
             return proc.ExitCode;
         }
     }

@@ -37,13 +37,11 @@ namespace SkriptKit.Core.Shells
                 }
             };
             proc.StartInfo.ArgumentList.Add("-c");
+            proc.StartInfo.ArgumentList.Add(script);
             proc.Start();
-            using (StreamWriter sw = proc.StandardInput)
-                sw.WriteLine(script);
             proc.WaitForExit();
             StandardOutput = proc.StandardOutput.ReadToEnd();
             StandardError = proc.StandardError.ReadToEnd();
-            proc.WaitForExit();
             return proc.ExitCode;
         }
     }
