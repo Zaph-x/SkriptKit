@@ -17,19 +17,29 @@ Using SkriptKit, script objects can be stored in JSON format for dynamic loading
 #### Reading A Script From A File
 ```cs
 string content;
-using (StreamReader sr = new StreamReader(@".\addition.ps1"))
+using (StreamReader sr = new StreamReader(@".\getADUserEmail.ps1"))
 {
     content = sr.ReadToEnd();
     /*
 
-    $a = 3
-    $b = 4
-    $c = $a + $b
-    $c | out-host
+    $sams = Import-Csv .\sams.csv
+
+    foreach ($entry in $sams) {
+        $(Get-ADUser $entry.sAMAccountName -Properties Initials | select -ExpandProperty initials) | out-host
+    }
     
     */
 }
 Script script = new Script("pwsh", content, false);
 script.Run();
-Console.WriteLine(script.Shell.StandardOutput); // 7
+Console.WriteLine(script.Shell.StandardOutput);
+/*
+
+JAMS
+KUTF
+OGHS
+LKRT
+MOEEs
+
+*/
 ```
