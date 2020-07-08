@@ -18,6 +18,10 @@ namespace SkriptKit.Core.Shells
 
         public Bash(bool wsl)
         {
+            if (!wsl && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new InvalidOSException("Bash can only be run on Windows with WSL set to true");
+            }
             WSL = wsl;
             _interpreter = wsl ? "wsl" : "/bin/bash";
         }
