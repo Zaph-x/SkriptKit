@@ -23,7 +23,7 @@ namespace SkriptKit.Test
         [Test]
         public void Test_Python_CanExecuteScript()
         {
-            script.ScriptBlock = @"a = 1 + 1
+            script.ScriptBlock = @"a = 1 + 3
 print(a)";
             CustomShell custom = new CustomShell("python", "-c");
             script.Shell = custom;

@@ -1,3 +1,4 @@
+using SkriptKit.Core.Exceptions;
 using SkriptKit.Core.Interfaces;
 
 namespace SkriptKit.Core.Objects
@@ -36,6 +37,10 @@ namespace SkriptKit.Core.Objects
 
         public override Script Build()
         {
+            if (_script.Shell == null)
+            {
+                throw new NoShellException("No shell was provided for the script builder.");
+            }
             return _script;
         }
     }

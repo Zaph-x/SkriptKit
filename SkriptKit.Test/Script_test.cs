@@ -67,9 +67,21 @@ namespace SkriptKit.Test
 
         [Test]
         [Platform(Exclude = "Linux,Unix,MacOsX")]
-        public void Test_Run_ShouldHaveIOAccess()
+        public void Test_Run_ShouldHaveIOAccessPowerShell()
         {
             var mock = new Mock<PowerShell>(3);
+            mock.SetupGet(shell => shell.IsElevated).Returns(true);
+            script.Shell = mock.Object;
+            script.ScriptBlock = @"echo ""test"" > .\test.txt";
+            script.RequireAdministrator = true;
+            Assert.AreEqual(0, script.Run(), "User was not considered admin");
+            TestHelper.WriteOutput(script.Shell, TestContext.CurrentContext);
+        }
+        [Test]
+        [Platform(Exclude = "Win")]
+        public void Test_Run_ShouldHaveIOAccessBash()
+        {
+            var mock = new Mock<Bash>(false);
             mock.SetupGet(shell => shell.IsElevated).Returns(true);
             script.Shell = mock.Object;
             script.ScriptBlock = @"echo ""test"" > .\test.txt";
