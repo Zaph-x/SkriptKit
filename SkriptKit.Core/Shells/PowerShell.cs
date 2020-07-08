@@ -25,13 +25,13 @@ namespace SkriptKit.Core.Shells
                 case 3:
                     _version = PSVersion.V3;
                     break;
+                case 5:
                 case 6:
-                    _version = PSVersion.V6;
-                    break;
                 case 7:
-                    _version = PSVersion.V7;
+                    _version = PSVersion.Core;
                     break;
-
+                default:
+                    throw new InvalidShellException("No PowerShell version with that version tag");
             }
         }
 
