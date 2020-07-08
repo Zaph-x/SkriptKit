@@ -43,13 +43,13 @@ namespace SkriptKit.Core.Shells
                 case 3:
                     _version = PSVersion.V3;
                     break;
+                case 5:
                 case 6:
-                    _version = PSVersion.V6;
-                    break;
                 case 7:
-                    _version = PSVersion.V7;
+                    _version = PSVersion.Core;
                     break;
-
+                default:
+                    throw new InvalidShellException("No PowerShell version with that version tag");
             }
             Script script = new Script() { RequireAdministrator = requiresAdmin, ScriptBlock = scriptBlock, Shell = this };
             if (runNow)
@@ -70,8 +70,7 @@ namespace SkriptKit.Core.Shells
                         throw new InvalidOSException("PowerShell V3.x scripts must be executed on a Windows machine.");
                     }
                     break;
-                case PSVersion.V6:
-                case PSVersion.V7:
+                case PSVersion.Core:
                     _interpreter = "pwsh";
                     break;
             }
