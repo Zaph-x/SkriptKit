@@ -68,6 +68,18 @@ namespace SkriptKit.Core.Objects
             return script;
         }
 
+        public static string ToJson(Script script)
+        {
+            return JsonConvert.SerializeObject(script);
+           
+        }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this);
+           
+        }
+
         public void SetShell()
         {
             switch (Interpreter.ToLower())
