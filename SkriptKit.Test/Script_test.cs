@@ -1,3 +1,4 @@
+using System.IO;
 using System.Runtime.InteropServices;
 using System;
 using Moq;
@@ -183,6 +184,30 @@ namespace SkriptKit.Test
             Script script = Script.FromJson(json);
             script.Run();
             Assert.AreEqual("world"+Environment.NewLine, script.Shell.StandardOutput, "Placeholders did not convert correct");
+        }
+
+        [Test]
+        [Platform(Exclude="Unix")]
+        public void Test_Script_CanBeReadFromFile()
+        {
+            string content;
+            try { File.Delete(@".\test.ps1"); }
+            catch{}
+            using (StreamWriter sw = new StreamWriter(@".\test.ps1"))
+            {
+                sw.WriteLine(@"$a = 3
+$b = 4
+$c = $a + $b
+$c");
+            }
+            using (StreamReader sr = new StreamReader(@".\test.ps1"))
+            {
+                content = sr.ReadToEnd();
+            }
+
+            Script script = new Script("pwsh", content, false);
+            script.Run();
+            Assert.AreEqual("7"+Environment.NewLine, script.Shell.StandardOutput, "Script did not execute correct");
         }
     }
 }

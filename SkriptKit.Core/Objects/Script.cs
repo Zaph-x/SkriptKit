@@ -27,6 +27,13 @@ namespace SkriptKit.Core.Objects
             ScriptBlock = scriptBlock;
             RequireAdministrator = requiresAdmin;
         }
+        public Script(string interpreter, string scriptBlock, bool requiresAdmin)
+        {
+            Interpreter = interpreter;
+            SetShell();
+            ScriptBlock = scriptBlock;
+            RequireAdministrator = requiresAdmin;
+        }
 
         public Script() {}
 
