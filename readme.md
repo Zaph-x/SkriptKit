@@ -10,7 +10,7 @@ The library will be used in future .NET projects where an interface between the 
 
 ## Storing Scripts
 
-Using SkriptKit, script objects can be stored in JSON format for dynamic loading of scripts. Furthermore, scripts can contain placeholder values that can be used in dynamic execution in applications where the user might want to enter values for the placeholder.
+Using SkriptKit, script objects can be stored in JSON format for dynamic loading of scripts. Furthermore, scripts can contain placeholder values that can be used in applications where the user might want to enter custom values.
 
 ## Example Code
 
