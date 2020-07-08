@@ -11,7 +11,6 @@ namespace SkriptKit.Core.Shells
     public class Bash : IShell
     {
         private string _interpreter { get; set; }
-        private string _exitCodeVariable { get; set; }
         public string StandardOutput { get; private set; }
         public string StandardError { get; private set; }
         public virtual bool IsElevated { get; private set; }

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System;
 using Moq;
 using NUnit.Framework;
@@ -99,6 +100,89 @@ namespace SkriptKit.Test
             script.Run();
             Assert.IsInstanceOf(typeof(PowerShell), script.Shell, "Correct interpreter was not chosen");
             TestHelper.WriteOutput(script.Shell, TestContext.CurrentContext);
+        }
+
+        [Test]
+        public void Test_Script_CanDeserializeInterpreter()
+        {
+            string json = @"{
+                'Interpreter': 'pwsh',
+                'RequiresAdministrator':false,
+                'ScriptBlock':'echo ""hello""'
+            }";
+            Script script = Script.FromJson(json);
+
+            Assert.AreEqual("pwsh", script.Interpreter, "Interpreter was not deserialised correct");
+        }
+        [Test]
+        public void Test_Script_CanDeserializeScriptBlock()
+        {
+            string json = @"{
+                'Interpreter': 'pwsh',
+                'RequiresAdministrator':false,
+                'ScriptBlock':'echo ""hello""'
+            }";
+            Script script = Script.FromJson(json);
+
+            Assert.AreEqual(@"echo ""hello""", script.ScriptBlock, "ScriptBlock was not deserialised correct");
+        }
+        [Test]
+        public void Test_Script_CanDeserializeRequiresAdmin()
+        {
+            string json = @"{
+                'Interpreter': 'pwsh',
+                'RequiresAdministrator':false,
+                'ScriptBlock':'echo ""hello""'
+            }";
+            Script script = Script.FromJson(json);
+
+            Assert.AreEqual(false, script.RequireAdministrator, "Interpreter was not deserialised correct");
+        }
+        [Test]
+        public void Test_Script_CanDeserializeShell()
+        {
+            string json = @"{
+                'Interpreter': 'pwsh',
+                'RequiresAdministrator':false,
+                'ScriptBlock':'echo ""hello""'
+            }";
+            Script script = Script.FromJson(json);
+
+            Assert.IsInstanceOf<PowerShell>(script.Shell, "Shell was not correct on deserialise");
+        }
+
+        
+        [Test]
+        public void Test_Script_CanDeserializePlaceholders()
+        {
+            string json = @"{
+                'Interpreter': 'pwsh',
+                'RequiresAdministrator':false,
+                'ScriptBlock':'echo ""hello""',
+                'Placeholders':{
+                    'hello':'world'
+                }
+            }";
+            Script script = Script.FromJson(json);
+
+            Assert.AreEqual(1, script.Placeholders.Count, "Placeholders was were deserialised correct");
+        }
+        
+        
+        [Test]
+        public void Test_Script_PlaceholdersConvertCorrectly()
+        {
+            string json = @"{
+                'Interpreter': 'pwsh',
+                'RequiresAdministrator':false,
+                'ScriptBlock':'echo ""hello""',
+                'Placeholders':{
+                    'hello':'world'
+                }
+            }";
+            Script script = Script.FromJson(json);
+            script.Run();
+            Assert.AreEqual("world"+Environment.NewLine, script.Shell.StandardOutput, "Placeholders did not convert correct");
         }
     }
 }
