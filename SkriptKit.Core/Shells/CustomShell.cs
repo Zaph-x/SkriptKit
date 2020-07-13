@@ -7,6 +7,7 @@ using SkriptKit.Core.Interfaces;
 using System.IO;
 using SkriptKit.Core.Objects.Helpers;
 using SkriptKit.Core.Objects;
+using System.Linq;
 
 namespace SkriptKit.Core.Shells
 {
@@ -16,20 +17,20 @@ namespace SkriptKit.Core.Shells
         public string StandardOutput { get; private set; }
         public string StandardError { get; private set; }
         public virtual bool IsElevated { get; private set; }
-        public string[] Arguments { get; private set; }
+        public List<string> Arguments { get; private set; }
 
-        public CustomShell(string interpreter, params string[] arguments)
-        {
-            _interpreter = interpreter;
-            Arguments = arguments;
-        }
-
-        public CustomShell(int version, bool requiresAdmin, string arguments, string scriptBlock, bool runNow)
+        public CustomShell(string interpreter, bool requiresAdmin, string arguments, string scriptBlock, bool runNow)
         {
             IsElevated = RootHelper.IsAdministrator;
             Script script = new Script() { RequireAdministrator = requiresAdmin, ScriptBlock = scriptBlock, Shell = this };
             if (runNow)
                 script.Run();
+        }
+
+        public CustomShell(string interpreter, string[] arguments)
+        {
+            _interpreter = interpreter;
+            Arguments = arguments.ToList();
         }
 
         public int RunScript(string script)
