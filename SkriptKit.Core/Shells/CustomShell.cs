@@ -20,15 +20,15 @@ namespace SkriptKit.Core.Shells
         public virtual bool IsElevated { get; private set; }
         public List<string> Arguments { get; private set; }
 
-        public CustomShell(string interpreter string arguments,     bool runNow)
+        public CustomShell(string interpreter)
         {
+            _interpreter = interpreter;
             IsElevated = RootHelper.IsAdministrator;
-            if (runNow)
-                Script.Run();
         }
 
         public CustomShell(string interpreter, string[] arguments)
         {
+            IsElevated = RootHelper.IsAdministrator;
             _interpreter = interpreter;
             Arguments = arguments.ToList();
         }
