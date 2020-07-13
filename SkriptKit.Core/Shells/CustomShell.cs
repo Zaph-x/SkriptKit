@@ -15,7 +15,6 @@ namespace SkriptKit.Core.Shells
     {
         private string _interpreter { get; set; }
         public string StandardOutput { get; private set; }
-        public Script Script { get; private set; }
         public string StandardError { get; private set; }
         public virtual bool IsElevated { get; private set; }
         public List<string> Arguments { get; private set; }
