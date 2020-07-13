@@ -21,6 +21,7 @@ namespace SkriptKit.Test
         }
 
         [Test]
+        [Platform(Exclude = "Win")]
         public void Test_ScriptBuilder_CanAddALine()
         {
             string line = @"echo ""Test""";
@@ -33,6 +34,7 @@ namespace SkriptKit.Test
         }
 
         [Test]
+        [Platform(Exclude = "Win")]
         public void Test_ScriptBuilder_CanAssignRunAsNoParam()
         {
             bool expectedRunAs = true;
@@ -45,6 +47,7 @@ namespace SkriptKit.Test
         }
 
         [Test]
+        [Platform(Exclude = "Win")]
         public void Test_ScriptBuilder_CanAssignRunAsWithParam()
         {
             bool expectedRunAs = true;
@@ -57,6 +60,7 @@ namespace SkriptKit.Test
         }
 
         [Test]
+        [Platform(Exclude = "Win")]
         public void Test_ScriptBuilder_CanAssignCorrectShell()
         {
             builder.SetShell(new Bash(false));

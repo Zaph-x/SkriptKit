@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using NUnit.Framework;
 using SkriptKit.Core.Interfaces;
@@ -21,6 +22,14 @@ namespace SkriptKit.Test
                 sw.WriteLine(shell.StandardOutput);
                 sw.WriteLine("STDERR:");
                 sw.WriteLine(shell.StandardError);
+            }
+        }
+
+        public static void IsInEnvironment(string variable, string errorMessage)
+        {
+            if (!Environment.GetEnvironmentVariable("path")?.ToLower()?.Contains(variable) ?? false)
+            {
+                Assert.Inconclusive(errorMessage);
             }
         }
     }

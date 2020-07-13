@@ -15,16 +15,16 @@ namespace SkriptKit.Core.Shells
     {
         private string _interpreter { get; set; }
         public string StandardOutput { get; private set; }
+        public Script Script { get; private set; }
         public string StandardError { get; private set; }
         public virtual bool IsElevated { get; private set; }
         public List<string> Arguments { get; private set; }
 
-        public CustomShell(string interpreter, bool requiresAdmin, string arguments, string scriptBlock, bool runNow)
+        public CustomShell(string interpreter string arguments,     bool runNow)
         {
             IsElevated = RootHelper.IsAdministrator;
-            Script script = new Script() { RequireAdministrator = requiresAdmin, ScriptBlock = scriptBlock, Shell = this };
             if (runNow)
-                script.Run();
+                Script.Run();
         }
 
         public CustomShell(string interpreter, string[] arguments)

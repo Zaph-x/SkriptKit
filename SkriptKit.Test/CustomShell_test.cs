@@ -10,7 +10,7 @@ using SkriptKit.Core.Shells;
 namespace SkriptKit.Test
 {
     [TestFixture]
-    [Platform(Exclude="Linux,Unix,MacOsX")]
+    [Platform(Exclude = "Linux,Unix,MacOsX")]
     public class CustomShell_Tests
     {
         Script script;
@@ -23,9 +23,11 @@ namespace SkriptKit.Test
         [Test]
         public void Test_Python_CanExecuteScript()
         {
+            TestHelper.IsInEnvironment("python", "Python not found in environment. Test is inconclusive.");
+
             script.ScriptBlock = @"a = 1 + 3
 print(a)";
-            CustomShell custom = new CustomShell("python", "-c");
+            CustomShell custom = new CustomShell("python", new string[] { "-c" });
             script.Shell = custom;
             Assert.AreEqual(0, script.Run(), "Python did not run the script");
             TestHelper.WriteOutput(script.Shell, TestContext.CurrentContext);
@@ -34,9 +36,11 @@ print(a)";
         [Test]
         public void Test_Python_ShouldFailOnInvalidSyntax()
         {
+            TestHelper.IsInEnvironment("python", "Python not found in environment. Test is inconclusive.");
+
             script.ScriptBlock = @"a = 1 + 1
 print(a";
-            CustomShell custom = new CustomShell("python", "-c");
+            CustomShell custom = new CustomShell("python", new string[] { "-c" });
             script.Shell = custom;
             Assert.AreNotEqual(0, script.Run(), "Python ran the script without returning a non-zero exit code");
             TestHelper.WriteOutput(script.Shell, TestContext.CurrentContext);
