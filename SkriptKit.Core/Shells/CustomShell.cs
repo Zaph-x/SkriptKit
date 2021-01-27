@@ -14,10 +14,25 @@ namespace SkriptKit.Core.Shells
     public class CustomShell : IShell
     {
         private string _interpreter { get; set; }
+        public Script Script { get; }
         public string StandardOutput { get; private set; }
         public string StandardError { get; private set; }
         public virtual bool IsElevated { get; private set; }
         public List<string> Arguments { get; private set; }
+        private Process _process { get; set; }
+
+        private Action<object, DataReceivedEventArgs> _outputHandle = (s, e) => Debug.WriteLine(e.Data);
+        private Action<object, DataReceivedEventArgs> _errHandle = (s, e) => Debug.WriteLine(e.Data);
+
+        public void SetOutputHandle(Action<object, DataReceivedEventArgs> handler)
+        {
+            _outputHandle = handler;
+        }
+
+        public void SetErrorHandle(Action<object, DataReceivedEventArgs> handler)
+        {
+            _errHandle = handler;
+        }
 
         public CustomShell(string interpreter)
         {
@@ -34,7 +49,7 @@ namespace SkriptKit.Core.Shells
 
         public int RunScript(string script)
         {
-            Process proc = new Process()
+            _process = new Process()
             {
                 StartInfo = new ProcessStartInfo()
                 {
@@ -46,13 +61,25 @@ namespace SkriptKit.Core.Shells
                     RedirectStandardInput = true,
                 }
             };
-            foreach (string arg in Arguments) { proc.StartInfo.ArgumentList.Add(arg); }
-            proc.StartInfo.ArgumentList.Add(script);
-            proc.Start();
-            proc.WaitForExit();
-            StandardOutput = proc.StandardOutput.ReadToEnd();
-            StandardError = proc.StandardError.ReadToEnd();
-            return proc.ExitCode;
+            foreach (string arg in Arguments) { _process.StartInfo.ArgumentList.Add(arg); }
+            _process.StartInfo.ArgumentList.Add(script);
+            _process.Start();
+            _process.WaitForExit();
+            StandardOutput = _process.StandardOutput.ReadToEnd();
+            StandardError = _process.StandardError.ReadToEnd();
+            return _process.ExitCode;
+        }
+
+        public int Run()
+        {
+            return Script.Run();
+        }
+
+
+        public int Stop()
+        {
+            _process.Kill();
+            return _process.ExitCode;
         }
     }
 }

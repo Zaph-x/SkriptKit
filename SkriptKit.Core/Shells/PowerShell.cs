@@ -13,9 +13,28 @@ namespace SkriptKit.Core.Shells
     {
         private PSVersion _version { get; set; }
         private string _interpreter { get; set; }
+        public string Arguments { get; private set; }
         public string StandardOutput { get; private set; }
+        public int ExitCode { get; private set; }
         public string StandardError { get; private set; }
         public virtual bool IsElevated { get; private set; }
+        public bool IsRunning { get => !_process.HasExited; }
+        public bool RedirectStdIn { get; set; }
+        public Script Script { get; set; }
+        private Process _process { get; set; }
+
+        private Action<object, DataReceivedEventArgs> _outputHandle = (s, e) => Debug.WriteLine(e.Data);
+        private Action<object, DataReceivedEventArgs> _errHandle = (s, e) => Debug.WriteLine(e.Data);
+
+        public void SetOutputHandle(Action<object,DataReceivedEventArgs> handler)
+        {
+            _outputHandle = handler;
+        }
+
+        public void SetErrorHandle(Action<object, DataReceivedEventArgs> handler)
+        {
+            _errHandle = handler;
+        }
 
         public PowerShell(int version)
         {
@@ -37,6 +56,7 @@ namespace SkriptKit.Core.Shells
 
         public PowerShell(int version, bool requiresAdmin, string arguments, string scriptBlock, bool runNow)
         {
+            Arguments = arguments;
             IsElevated = RootHelper.IsAdministrator;
             switch (version)
             {
@@ -51,9 +71,9 @@ namespace SkriptKit.Core.Shells
                 default:
                     throw new InvalidShellException("No PowerShell version with that version tag");
             }
-            Script script = new Script() { RequireAdministrator = requiresAdmin, ScriptBlock = scriptBlock, Shell = this };
+            Script = new Script() { RequireAdministrator = requiresAdmin, ScriptBlock = scriptBlock, Shell = this };
             if (runNow)
-                script.Run();
+                Script.Run();
         }
 
         public int RunScript(string script)
@@ -74,7 +94,7 @@ namespace SkriptKit.Core.Shells
                     _interpreter = "pwsh";
                     break;
             }
-            Process proc = new Process()
+            _process = new Process()
             {
                 StartInfo = new ProcessStartInfo()
                 {
@@ -83,16 +103,38 @@ namespace SkriptKit.Core.Shells
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    RedirectStandardInput = true,
+                    RedirectStandardInput = RedirectStdIn,
                 }
             };
-            proc.StartInfo.ArgumentList.Add("-c");
-            proc.StartInfo.ArgumentList.Add(script);
-            proc.Start();
-            proc.WaitForExit();
-            StandardOutput = proc.StandardOutput.ReadToEnd();
-            StandardError = proc.StandardError.ReadToEnd();
-            return proc.ExitCode;
+
+            _process.OutputDataReceived += new DataReceivedEventHandler(_outputHandle);
+            _process.ErrorDataReceived += new DataReceivedEventHandler(_errHandle);
+            _process.OutputDataReceived += (s, e) => {
+                StandardOutput += $"{e.Data}{Environment.NewLine}";
+                Debug.WriteLine(e.Data);
+            };
+            _process.ErrorDataReceived += (s, e) => {
+                StandardError += $"{e.Data}{Environment.NewLine}";
+                Debug.WriteLine(e.Data);
+            };
+            _process.StartInfo.Arguments = $"{Arguments} -File \"{script}\"";
+            _process.Start();
+            _process.BeginOutputReadLine();
+            _process.BeginErrorReadLine();
+            _process.WaitForExit();
+
+            return ExitCode = _process.ExitCode;
+        }
+
+        public int Run()
+        {
+            return ExitCode = Script.Run();
+        }
+
+        public int Stop()
+        {
+            _process.Kill();
+            return ExitCode = _process.ExitCode;
         }
     }
 }
