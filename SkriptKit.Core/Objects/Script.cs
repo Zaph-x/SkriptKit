@@ -18,6 +18,7 @@ namespace SkriptKit.Core.Objects
         public string Interpreter { get; set; }
         public string ScriptBlock { get; set; }
         public string[] ShellArgs { get; set; }
+        private static Func<bool> _elevationCheckOverrideFunction { get; set; }
         public bool RequireAdministrator { get; set; }
         public Dictionary<string, string> Placeholders {get;set;} = new Dictionary<string, string>();
 
@@ -53,7 +54,7 @@ namespace SkriptKit.Core.Objects
             }
             if (RequireAdministrator)
             {
-                if (Shell.IsElevated)
+                if (Shell.IsElevated || (_elevationCheckOverrideFunction?.Invoke() ?? false))
                 {
                     return Shell.RunScript(ScriptBlock);
                 }
@@ -85,6 +86,11 @@ namespace SkriptKit.Core.Objects
         {
             return JsonConvert.SerializeObject(this);
            
+        }
+
+        public static void SetElevationOverrideFunction(Func<bool> func)
+        {
+            _elevationCheckOverrideFunction = func;
         }
 
         public void SetShell()
